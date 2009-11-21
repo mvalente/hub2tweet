@@ -26,7 +26,7 @@ config.put()
 
 
 class OAuthConfig(db.Model):
-  """OAuth configuration""
+  """OAuth configuration"""
 
   consumer_key = db.StringProperty(required=True)
   consumer_secret = db.StringProperty(required=True)
