@@ -1,5 +1,6 @@
 <html>
 <body>
-Hello world!
+<p>Hello world!</p>
+<p><a href="/authenticate">Authentication test</a></p>
 </body>
 <html/>
