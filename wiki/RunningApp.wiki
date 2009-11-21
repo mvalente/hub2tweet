@@ -1,4 +1,3 @@
-
 How to run the app:
 
 Check it out.
@@ -11,6 +10,7 @@ which should give you the full path, something like:
 /usr/local/bin/dev_appserver.py
 
 Use python2.5 to run it in the directory you checked out (note the period for current workind directory).
+
 $ python2.5 /usr/local/bin/dev_appserver.py .   
 
 Then visit http://localhost:8080
