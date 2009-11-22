@@ -7,22 +7,14 @@ from google.appengine.ext import db
 #
 # The configuration is stored in datastore as we don't want to check our
 # private keys into an open source project.  The first config in the
-# datastore will be used.  To set your config, go to the Interactive Console:
+# datastore will be used.
 #
-# http://localhost:8080/_ah/admin/interactive
+# To help make this easier to set, a simple admin config page was added.
+# On your server, visit: http://<server>/admin/oauth_config
 #
 # And add a config to the datastore manually (copy paste this code, and fill in
 # the right key and secret).  You can verify and change with the Datastore
 # Viewer.
-"""
-import models
-
-config = models.OAuthConfig(
- consumer_key="<key>"
- consumer_secret="<secret>")
-
-config.put()
-"""
 
 
 class OAuthConfig(db.Model):
