@@ -10,7 +10,7 @@ def get_hub_from_feed(xml_doc):
     xml_doc = xml.dom.minidom.parseString(xml_doc)
   elements = xml_doc.getElementsByTagName('link')
   for i in elements:
-    if i.hasAttribute('rel')==True:
+    if i.hasAttribute('rel'):
       if i.getAttribute('rel') == 'hub':
         href = i.getAttribute('href')
   return href
