@@ -1,24 +1,19 @@
 """Handlers for OAuth authentication to Twitter."""
 
 # PSL imports
+import cgi
+import logging
 import os
 import urllib2
 
 # App Engine imports
+from google.appengine.ext import db
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 # Our imports
 import models
 from third_party import oauth
-
-def _get_consumer_key_and_secret():
-  """Pull the key and secret from datastore."""
-  configs = models.OAuthConfig.all()
-
-  if configs.count():
-    config = configs[0]
-    return config.consumer_key, config.consumer_secret
 
 
 class AuthenticateHandler(webapp.RequestHandler):
@@ -32,14 +27,7 @@ class AuthenticateHandler(webapp.RequestHandler):
     CallbackHandler.
     """
 
-    auth_tuple = _get_consumer_key_and_secret()
-    if not auth_tuple:
-      self.response.out.write('Keys not configured.')
-      return
-
-    key, secret = auth_tuple
-    consumer = oauth.OAuthConsumer(key, secret)
-
+    consumer = _get_consumer()
     req_url = 'http://twitter.com/oauth/request_token'
     # Make callback relative to working server.
     # Particularly for localhost when running locally.
@@ -56,6 +44,11 @@ class AuthenticateHandler(webapp.RequestHandler):
     response = urllib2.urlopen(req.to_url()).read()
     token = oauth.OAuthToken.from_string(response)
 
+    # Save token so we can fetch it on callback.
+    data_token = models.OAuthToken.get_or_insert(token.key, secret=token.secret)
+    data_token.secret = token.secret
+    data_token.put()
+    
     # Build authentication token request
     auth_url = 'http://twitter.com/oauth/authorize'
     req = oauth.OAuthRequest.from_token_and_callback(
@@ -70,7 +63,39 @@ class AuthenticateHandler(webapp.RequestHandler):
 class CallbackHandler(webapp.RequestHandler):
   """Handles the callback from the Twitter OAuth authenticator."""
   def get(self):
-    self.response.out.write('Successfully called back.  TODO: properly handle.')
+    consumer = _get_consumer()
+
+    # We're given the token, but need the secret we stored earlier
+    token_param = self.request.get('oauth_token')
+    data_token = models.OAuthToken.get_by_key_name(token_param)
+
+    token = oauth.OAuthToken(token_param, data_token.secret)
+
+    verifier = self.request.get('oauth_verifier')
+
+    # Fetch the access token with this request token.
+    access_token_url = 'http://twitter.com/oauth/access_token'
+    oauth_request = oauth.OAuthRequest.from_consumer_and_token(
+      consumer, token=token, verifier=verifier, http_url=access_token_url)
+    oauth_request.sign_request(oauth.OAuthSignatureMethod_HMAC_SHA1(), consumer, token)
+    response = urllib2.urlopen(oauth_request.to_url()).read()
+
+    # Data comes back urlencoded in the body.
+    data = cgi.parse_qs(response)
+
+    # Save token data
+    access_token = data['oauth_token'][0]
+    user = models.TwitterUser.get_or_insert(
+      access_token,
+      secret = data['oauth_token_secret'][0],
+      user_id = int(data['user_id'][0]),
+      screen_name = data['screen_name'][0])
+    user.put()
+
+    # Set the cookie for the user so we can match it up later.
+    self.response.headers.add_header('Set-Cookie', 'token=%s' % access_token)
+
+    self.response.out.write('Successfully called back.  Saved token to cookie.')
 
 
 class OAuthConfigHandler(webapp.RequestHandler):
@@ -100,5 +125,22 @@ class OAuthConfigHandler(webapp.RequestHandler):
     new_config.put()
 
     self.redirect('/admin/oauth_config')
+
+
+def _get_consumer():
+  """Get an OAuth consumer object seeded by the datastore values."""
+  auth_tuple = _get_consumer_key_and_secret()
+  if auth_tuple:
+    key, secret = auth_tuple
+    return oauth.OAuthConsumer(key, secret)
+
+
+def _get_consumer_key_and_secret():
+  """Pull the key and secret from datastore."""
+  configs = models.OAuthConfig.all()
+
+  if configs.count():
+    config = configs[0]
+    return config.consumer_key, config.consumer_secret
 
 
