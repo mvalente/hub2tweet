@@ -16,7 +16,7 @@ def _get_consumer_key_and_secret():
   """Pull the key and secret from datastore."""
   configs = models.OAuthConfig.all()
 
-  if configs:
+  if configs.count():
     config = configs[0]
     return config.consumer_key, config.consumer_secret
 
