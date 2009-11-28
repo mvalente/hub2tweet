@@ -23,3 +23,14 @@ class OAuthConfig(db.Model):
   consumer_key = db.StringProperty(required=True)
   consumer_secret = db.StringProperty(required=True)
 
+
+class OAuthToken(db.Model):
+  # key name is token
+  secret = db.StringProperty(required=True)
+
+
+class TwitterUser(db.Model):
+  # key name is token
+  secret = db.StringProperty(required=True)
+  user_id = db.IntegerProperty(required=True)
+  screen_name = db.StringProperty(required=True)
