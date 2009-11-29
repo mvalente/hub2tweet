@@ -34,3 +34,8 @@ class TwitterUser(db.Model):
   secret = db.StringProperty(required=True)
   user_id = db.IntegerProperty(required=True)
   screen_name = db.StringProperty(required=True)
+
+
+class TopicSubscription(db.Model):
+  user_id = db.IntegerProperty(required=True)
+  topic = db.StringProperty(required=True)
