@@ -13,6 +13,7 @@ from google.appengine.ext.webapp import template
 
 # Our imports
 import models
+import oauthutil
 from third_party import oauth
 
 
@@ -27,7 +28,7 @@ class AuthenticateHandler(webapp.RequestHandler):
     CallbackHandler.
     """
 
-    consumer = _get_consumer()
+    consumer = oauthutil.get_consumer()
     req_url = 'http://twitter.com/oauth/request_token'
     # Make callback relative to working server.
     # Particularly for localhost when running locally.
@@ -63,7 +64,7 @@ class AuthenticateHandler(webapp.RequestHandler):
 class CallbackHandler(webapp.RequestHandler):
   """Handles the callback from the Twitter OAuth authenticator."""
   def get(self):
-    consumer = _get_consumer()
+    consumer = oauthutil.get_consumer()
 
     # We're given the token, but need the secret we stored earlier
     token_param = self.request.get('oauth_token')
@@ -125,22 +126,3 @@ class OAuthConfigHandler(webapp.RequestHandler):
     new_config.put()
 
     self.redirect('/admin/oauth_config')
-
-
-def _get_consumer():
-  """Get an OAuth consumer object seeded by the datastore values."""
-  auth_tuple = _get_consumer_key_and_secret()
-  if auth_tuple:
-    key, secret = auth_tuple
-    return oauth.OAuthConsumer(key, secret)
-
-
-def _get_consumer_key_and_secret():
-  """Pull the key and secret from datastore."""
-  configs = models.OAuthConfig.all()
-
-  if configs.count():
-    config = configs[0]
-    return config.consumer_key, config.consumer_secret
-
-
