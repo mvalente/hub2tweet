@@ -14,3 +14,6 @@ Use python2.5 to run it in the directory you checked out (note the period for cu
 $ python2.5 /usr/local/bin/dev_appserver.py .   
 
 Then visit http://localhost:8080
+
+
+To get OAuth configured, you have to visit /admin/oauth_config and put in your Twitter OAuth token and secret.
