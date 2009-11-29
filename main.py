@@ -13,6 +13,7 @@ from google.appengine.ext.webapp import template
 
 # Our imports
 import models
+import pubsubhandlers
 import twitterutil
 import twitteroauthhandlers
 
@@ -31,7 +32,10 @@ def main():
       ('/', MainHandler),
       ('/authenticate', twitteroauthhandlers.AuthenticateHandler),
       ('/oauth_callback', twitteroauthhandlers.CallbackHandler),
-      ('/admin/oauth_config', twitteroauthhandlers.OAuthConfigHandler)
+      ('/pubsub/add_subscription', pubsubhandlers.AddSubscriptionHandler),
+      # Admin
+      ('/admin/oauth_config', twitteroauthhandlers.OAuthConfigHandler),
+      ('/admin/test_add_sub', pubsubhandlers.AddSubscriptionFormHandler),
       ], debug=True)
   wsgiref.handlers.CGIHandler().run(application)
 
