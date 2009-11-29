@@ -7,6 +7,10 @@ import models
 
 from third_party import oauth
 
+def get_user_by_token_key(key):
+  """Gets the TwitterUser object associated with the given key name."""
+  return models.TwitterUser.get_by_key_name(key)
+
 def set_status_by_user_id(status, user_id):
   """Set a status by user id.  ID is expected to be in the datastore."""
   key, secret = get_key_and_secret(user_id)

@@ -13,17 +13,20 @@ from google.appengine.ext.webapp import template
 
 # Our imports
 import models
+import twitterutil
 import twitteroauthhandlers
 
 
 class MainHandler(webapp.RequestHandler):
 
   def get(self):
-    text = template.render('templates/index.tpl', {})
+    user = twitterutil.get_user_by_token_key(self.request.cookies['token'])
+    text = template.render('templates/index.tpl', {
+        'user': user
+    })
     self.response.out.write(text)
 
 def main():
-
   application = webapp.WSGIApplication([
       ('/', MainHandler),
       ('/authenticate', twitteroauthhandlers.AuthenticateHandler),
