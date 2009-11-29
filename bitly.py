@@ -7,11 +7,12 @@ _BITLY_API_KEY = 'R_8b57834cbee48f8419e98bf7af03f4d4'
 
 def get_shortened_url(url):
   """Shorten the given URL with the Bitly API."""
-  
-  # TODO(sawyer): Fill this in.  Use urllib2 to fetch the JSON object
-  # and simplejson to parse out the shortened URL.
-  # See http://code.google.com/p/bitly-api/wiki/ApiDocumentation and
-  # http://simplejson.googlecode.com/svn/tags/simplejson-2.0.9/docs/index.html
+  version = '2.0.1'
+  login = 'nanaze'
+  bitly_url= "http://api.bit.ly/shorten?version=%s&longUrl=%s&login=%s&apiKey=%s" % (version, url, login, _BITLY_API_KEY)
+  response = urllib2.urlopen(bitly_url).read()
+  json = simplejson.loads(response)
+  return json['results'].values()[0]['shortUrl']
 
 def main():
   """Run bitly as a command line tool.  Prints out a shortened url."""
