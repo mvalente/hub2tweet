@@ -1,0 +1,11 @@
+Notes on licenses and sources for files in this directory.
+
+oauth.py is the OAuth Python implementation library taken from the OAuth
+Google Code project page:
+http://code.google.com/p/oauth/
+
+In SVN, it's stored here:
+http://oauth.googlecode.com/svn/code/python/oauth/oauth.py
+
+The library is copyright Leah Culver, the author, and offered under the MIT
+license.
