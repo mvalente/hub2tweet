@@ -12,18 +12,14 @@ class AddSubscriptionHandler(webapp.RequestHandler):
     user = twitterutil.get_user_by_token_key(self.request.cookies['token'])
     feed_url = self.request.get('feed')
     callback_url = 'http://%s/pubsub' % os.environ['HTTP_HOST']
-
-    # TODO(sawyer): You need to do the following:
-    # 1. Fetch the feed.
-    # 2. Get the hub and the self links
-    # 3. Use urllib2 to send a POST request to the hub to subscribe to the feed
-    # in 'self'.
-    # See http://pubsubhubbub.googlecode.com/svn/trunk/pubsubhubbub-core-0.2.html#anchor5
-    # Your parameters should be hub.callback (above), hub.mode ('subscribe'),
-    # hub.topic (value of self link), hub.verify ('async' for now... I'll handle
-    # the rest later.
-    # 4. Make a new models.TopicSubscription with user.user_id for a user_id and
-    # the self href as the topic.
+    xml_doc = urllib2.urlopen(feed_url).read()
+    hub_link = get_hub(xml_doc)
+    self_link = get_self(xml_doc)
+    params = {'hub.callback': callback_url, 'hub.mode': 'subscribe', 'hub.topic': self_link, 'hub.verify': 'async'}
+    data = urllib.urlencode(params)
+    urllib2.urlopen(hub_link, data)
+    sub = models.TopicSubscription(user_id=user.user_id, topic=self_link)
+    sub.put() 
 
 class AddSubscriptionFormHandler(webapp.RequestHandler):
 
