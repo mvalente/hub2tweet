@@ -108,8 +108,8 @@ class OAuthConfigHandler(webapp.RequestHandler):
 
     consumer = oauthutil.get_consumer()
     if consumer:
-      values['consumer_key'] = consumer.consumer_key
-      values['consumer_secret'] = consumer.consumer_secret
+      values['consumer_key'] = consumer.key
+      values['consumer_secret'] = consumer.secret
 
     text = template.render('templates/oauthconfig.tpl', values)
     self.response.out.write(text)
