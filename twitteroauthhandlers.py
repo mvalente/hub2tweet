@@ -106,9 +106,10 @@ class OAuthConfigHandler(webapp.RequestHandler):
     """Write out the current keys and a form to change them."""
     values = {}
 
-    auth_tuple = _get_consumer_key_and_secret()
-    if auth_tuple:
-      values['consumer_key'], values['consumer_secret'] = auth_tuple
+    consumer = oauthutil.get_consumer()
+    if consumer:
+      values['consumer_key'] = consumer.consumer_key
+      values['consumer_secret'] = consumer.consumer_secret
 
     text = template.render('templates/oauthconfig.tpl', values)
     self.response.out.write(text)
