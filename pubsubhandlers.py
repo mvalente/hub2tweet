@@ -9,6 +9,14 @@ from google.appengine.ext import webapp
 
 import feeds
 import twitterutil
+import bitly
+
+def _get_text(nodelist):
+    rc = ""
+    for node in nodelist:
+        if node.nodeType == node.TEXT_NODE:
+            rc = rc + node.data
+    return rc
 
 class AddSubscriptionHandler(webapp.RequestHandler):
   
@@ -37,19 +45,21 @@ class NewContentTestHandler(webapp.RequestHandler):
   def handle_atom_feed(self, atom):
     xml_doc = xml.dom.minidom.parseString(atom)
     key, secret = twitterutil.get_key_and_secret(91536090) # hard-code hub2tweet for now
+    elements = xml_doc.getElementsByTagName('entry')
+    for entry in elements:
+      msg = _get_title_and_link(entry)
+      twitterutil.set_status(msg, key, secret)
+      self.response.out.write('sent tweet ' + msg)
 
-    # TODO(sawyer): Remove this.
-    self.response.out.write(atom)
-
-    # TODO(sawyer):
-    # Loop through each <entry> tag in xml_doc.  (get elements by tag name)  From each,
-    # get the value of the title tag and the href from the self tag.  Get the short form
-    # of the href URL from bit.ly.  Then concatenate the title and short url to make something
-    # that looks like "<title> <bitly URL>" -- cut off title so that it's no more than
-    # 140 characters.  Then, post that message to Twitter with the below statement.
-
-    # twitterutil.set_status(msg, key, secret)
-    
+  def _get_title_and_link(title, link):
+    title = entry.getElementsByTagName('title')
+    title_element = entry.getElementsByTagName('title')
+    title = _get_text(title_element)
+    title_short = title_text[0:140]
+    link = feeds.get_self(entry)
+    link_short = bitly.get_shortened_url(href)
+    msg = "<%s> <%s>" % (title_short, href_short)
+    return msg
 
 class AddSubscriptionFormHandler(webapp.RequestHandler):
 
