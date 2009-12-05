@@ -1,16 +1,14 @@
 """Handlers for subscriptions."""
 
 import os
-
-import twitterutil
+import urllib
+import urllib2
+import xml.dom.minidom
 
 from google.appengine.ext import webapp
 
-import urllib2
-
-import urllib
-
 import feeds
+import twitterutil
 
 class AddSubscriptionHandler(webapp.RequestHandler):
   
@@ -26,6 +24,32 @@ class AddSubscriptionHandler(webapp.RequestHandler):
     urllib2.urlopen(hub_link, data)
     sub = models.TopicSubscription(user_id=user.user_id, topic=self_link)
     sub.put() 
+
+class NewContentTestHandler(webapp.RequestHandler):
+  
+  #def post(self):
+  #  TODO(nathan): Add later
+
+  # TODO(nathan): remove this, make a POST
+  def get(self):
+    self.handle_atom_feed(open('feedstest.xml').read())
+
+  def handle_atom_feed(self, atom):
+    xml_doc = xml.dom.minidom.parseString(atom)
+    key, secret = twitterutil.get_key_and_secret(91536090) # hard-code hub2tweet for now
+
+    # TODO(sawyer): Remove this.
+    self.response.out.write(atom)
+
+    # TODO(sawyer):
+    # Loop through each <entry> tag in xml_doc.  (get elements by tag name)  From each,
+    # get the value of the title tag and the href from the self tag.  Get the short form
+    # of the href URL from bit.ly.  Then concatenate the title and short url to make something
+    # that looks like "<title> <bitly URL>" -- cut off title so that it's no more than
+    # 140 characters.  Then, post that message to Twitter with the below statement.
+
+    # twitterutil.set_status(msg, key, secret)
+    
 
 class AddSubscriptionFormHandler(webapp.RequestHandler):
 

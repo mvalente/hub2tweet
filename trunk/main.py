@@ -40,6 +40,7 @@ def main():
       # Admin
       ('/admin/oauth_config', twitteroauthhandlers.OAuthConfigHandler),
       ('/admin/test_add_sub', pubsubhandlers.AddSubscriptionFormHandler),
+      ('/admin/test_new_content_handler', pubsubhandlers.NewContentTestHandler)
       ], debug=True)
   wsgiref.handlers.CGIHandler().run(application)
 
