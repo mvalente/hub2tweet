@@ -21,10 +21,14 @@ import twitteroauthhandlers
 class MainHandler(webapp.RequestHandler):
 
   def get(self):
-    user = twitterutil.get_user_by_token_key(self.request.cookies['token'])
-    text = template.render('templates/index.tpl', {
-        'user': user
-    })
+    values = {}
+    if 'token' in self.request.cookies:
+      user = twitterutil.get_user_by_token_key(self.request.cookies['token'])
+      values['user'] = user
+
+
+    text = template.render('templates/index.tpl', values)
+
     self.response.out.write(text)
 
 def main():
