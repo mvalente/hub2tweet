@@ -10,7 +10,7 @@ import urllib2
 
 import urllib
 
-import feeds.py
+import feeds
 
 class AddSubscriptionHandler(webapp.RequestHandler):
   
@@ -19,8 +19,8 @@ class AddSubscriptionHandler(webapp.RequestHandler):
     feed_url = self.request.get('feed')
     callback_url = 'http://%s/pubsub' % os.environ['HTTP_HOST']
     xml_doc = urllib2.urlopen(feed_url).read()
-    hub_link = get_hub(xml_doc)
-    self_link = get_self(xml_doc)
+    hub_link = feeds.get_hub(xml_doc)
+    self_link = feeds.get_self(xml_doc)
     params = {'hub.callback': callback_url, 'hub.mode': 'subscribe', 'hub.topic': self_link, 'hub.verify': 'async'}
     data = urllib.urlencode(params)
     urllib2.urlopen(hub_link, data)
