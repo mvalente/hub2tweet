@@ -10,6 +10,9 @@
     your Twitter account.  Updates to your feeds will appear on Twitter
     instantly!
 
+    <p>(Well, it will when we're done with it.  It's still a work in progress.  But
+      you can log in and tweet from hub2tweet for now.)</p>
+
     {% if user %}
       <p>You are logged in as {{ user.screen_name }}.
         <a href="/logout">Log out</a>.
@@ -30,7 +33,7 @@
 
 
     {% else %}
-      <p>
+      <p style="text-align: center">
         <a href="/authenticate">
           <img src="/images/sign_in_twitter.png" />
         </a>
