@@ -19,9 +19,8 @@ def _get_text(nodelist):
   return rc
 
 def _get_msg(entry):
-  title = entry.getElementsByTagName('title')[0]
-  title_element = title.getElementsByTagName('title')
-  title = _get_text(title_element)
+  title_element = entry.getElementsByTagName('title')[0]
+  title = _get_text(title_element.childNodes)
   link = feeds.get_self(entry)
   title_short = title[0:140 - (1+len(link))]
   link_short = bitly.get_shortened_url(link)
