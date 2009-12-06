@@ -30,6 +30,8 @@ def set_status(status, oauth_token, oauth_secret):
     status: New Tweet, ideally < 140 characters.
     oauth_token: Access token.
     oauth_secret: Access token secret.
+
+  Returns: The server response.
   """
 
   consumer = oauthutil.get_consumer()
@@ -45,4 +47,4 @@ def set_status(status, oauth_token, oauth_secret):
   oauth_request.sign_request(oauth.OAuthSignatureMethod_HMAC_SHA1(), consumer, token)
   
   # This request actually posts the Tweet.
-  urllib2.urlopen(oauth_request.to_url(), '')
+  return urllib2.urlopen(oauth_request.to_url(), '').read()
