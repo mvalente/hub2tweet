@@ -1,0 +1,23 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: rgb(192, 222, 237); /*#9AE4E8;*/
+}
+
+#center {
+  margin: 0px auto;
+  width: 700px;
+}
+
+#header {
+  padding-left: 20px;
+  color: #FFF;
+  text-shadow: #6374AB
+}
+
+#content {
+  background-color: #FFF;
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 20px;
+  padding: 10px 20px;
+  line-height: 1.6;
+}
