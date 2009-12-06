@@ -26,14 +26,19 @@ class MainHandler(webapp.RequestHandler):
       user = twitterutil.get_user_by_token_key(self.request.cookies['token'])
       values['user'] = user
 
-
     text = template.render('templates/index.tpl', values)
-
     self.response.out.write(text)
+
+class LogOutHander(webapp.RequestHandler):
+  
+  def get(self):
+    self.response.headers.add_header('Set-Cookie', 'token=;Max-Age=0')
+    self.redirect('/')
 
 def main():
   application = webapp.WSGIApplication([
       ('/', MainHandler),
+      ('/logout', LogOutHander),
       ('/authenticate', twitteroauthhandlers.AuthenticateHandler),
       ('/oauth_callback', twitteroauthhandlers.CallbackHandler),
       ('/pubsub/add_subscription', pubsubhandlers.AddSubscriptionHandler),

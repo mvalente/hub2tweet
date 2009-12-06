@@ -96,7 +96,7 @@ class CallbackHandler(webapp.RequestHandler):
     # Set the cookie for the user so we can match it up later.
     self.response.headers.add_header('Set-Cookie', 'token=%s' % access_token)
 
-    self.response.out.write('Successfully called back.  Saved token to cookie.')
+    self.redirect('/')
 
 
 class OAuthConfigHandler(webapp.RequestHandler):
