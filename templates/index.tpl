@@ -11,7 +11,7 @@
     instantly!
 
     <p>(Well, it will when we're done with it.  It's still a work in progress.  But
-      you can log in and tweet from hub2tweet for now.)</p>
+      you can log in and tweet from hub2tweet for now.  We'll be done by December 11.)</p>
 
     {% if user %}
       <p>You are logged in as {{ user.screen_name }}.
