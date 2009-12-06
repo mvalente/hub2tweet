@@ -15,6 +15,19 @@
         <a href="/logout">Log out</a>.
       </p>    
 
+      <p>
+        <form action="/tweet" method=POST>
+          <h4>Tweet from hub2tweet</h4>
+          <div style="padding: 0px 30px;">
+            <textarea style="width: 100%; border: 1px solid#ccc; font-size: 16px" 
+                      rows="4" name="tweet"></textarea>
+            <div style="text-align: right">
+              <input type="submit" value="update">
+            </div>
+          </div>
+        </form>
+      </p>
+
 
     {% else %}
       <p>

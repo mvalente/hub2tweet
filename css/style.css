@@ -10,8 +10,11 @@ body {
 
 #header {
   padding-left: 20px;
+}
+
+#header a {
   color: #FFF;
-  text-shadow: #6374AB
+  text-decoration: none;
 }
 
 #content {

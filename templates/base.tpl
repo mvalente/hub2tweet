@@ -6,7 +6,7 @@
   <body>
     <div id=center>
       <div id=header>
-        <h1>hub2tweet</h1>
+        <h1><a href="/">hub2tweet</a></h1>
       </div>
       <div id=content>
         {% block content %}
