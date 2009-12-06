@@ -18,14 +18,14 @@ def _get_text(nodelist):
       rc = rc + node.data
   return rc
 
-def _get_title_and_link(title, link):
-  title = entry.getElementsByTagName('title')
+def _get_msg(entry):
+  title = entry.getElementsByTagName('title')[0]
   title_element = title.getElementsByTagName('title')
   title = _get_text(title_element)
-  title_short = title_text[0:140 - (1+len(link)]
   link = feeds.get_self(entry)
-  link_short = bitly.get_shortened_url(href)
-  msg = "%s %s" % (title_short, href_short)
+  title_short = title[0:140 - (1+len(link))]
+  link_short = bitly.get_shortened_url(link)
+  msg = "%s %s" % (title_short, link_short)
   return msg
 
 class AddSubscriptionHandler(webapp.RequestHandler):
@@ -57,7 +57,7 @@ class NewContentTestHandler(webapp.RequestHandler):
     key, secret = twitterutil.get_key_and_secret(91536090) # hard-code hub2tweet for now
     elements = xml_doc.getElementsByTagName('entry')
     for entry in elements:
-      msg = _get_title_and_link(entry)
+      msg = _get_msg(entry)
       twitterutil.set_status(msg, key, secret)
       self.response.out.write('sent tweet ' + msg)
 

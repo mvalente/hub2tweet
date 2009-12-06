@@ -37,7 +37,7 @@ def set_status(status, oauth_token, oauth_secret):
 
   update_url = 'http://twitter.com/statuses/update.xml'
   oauth_request = oauth.OAuthRequest.from_consumer_and_token(
-    consumer, token=token, http_method='POST', http_url=url, parameters=parameters)
+    consumer, token=token, http_method='POST', http_url=update_url)
 
   # POST signing isn't working.  It apparently works to just put the request as part
   # of the query string.
