@@ -12,11 +12,21 @@ import twitterutil
 import bitly
 
 def _get_text(nodelist):
-    rc = ""
-    for node in nodelist:
-        if node.nodeType == node.TEXT_NODE:
-            rc = rc + node.data
-    return rc
+  rc = ""
+  for node in nodelist:
+    if node.nodeType == node.TEXT_NODE:
+      rc = rc + node.data
+  return rc
+
+def _get_title_and_link(title, link):
+  title = entry.getElementsByTagName('title')
+  title_element = title.getElementsByTagName('title')
+  title = _get_text(title_element)
+  title_short = title_text[0:140 - (1+len(link)]
+  link = feeds.get_self(entry)
+  link_short = bitly.get_shortened_url(href)
+  msg = "%s %s" % (title_short, href_short)
+  return msg
 
 class AddSubscriptionHandler(webapp.RequestHandler):
   
@@ -51,15 +61,7 @@ class NewContentTestHandler(webapp.RequestHandler):
       twitterutil.set_status(msg, key, secret)
       self.response.out.write('sent tweet ' + msg)
 
-  def _get_title_and_link(title, link):
-    title = entry.getElementsByTagName('title')
-    title_element = entry.getElementsByTagName('title')
-    title = _get_text(title_element)
-    title_short = title_text[0:140]
-    link = feeds.get_self(entry)
-    link_short = bitly.get_shortened_url(href)
-    msg = "<%s> <%s>" % (title_short, href_short)
-    return msg
+  
 
 class AddSubscriptionFormHandler(webapp.RequestHandler):
 
