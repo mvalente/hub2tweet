@@ -67,9 +67,10 @@ class AddSubscriptionHandler(webapp.RequestHandler):
     sub.put() 
 
     response = urlfetch.fetch(hub_link, payload=data, method='POST')
-    if response.status_code != 202:
+    if response.status_code not in [202, 204]:
       self.error(502)
-      self.response.out.write('Error registering with hub: ')
+      self.response.out.write('Error registering with hub. ')
+      self.response.out.write('Status code response: %s. ' % response.status_code)
       self.response.out.write(response.content)
       return
 
@@ -78,16 +79,14 @@ class AddSubscriptionHandler(webapp.RequestHandler):
 class PubSubHandler(webapp.RequestHandler):
 
   def post(self):
-    content_type = self.request.headers.get('Content-Type')
-    if content_type == 'application/atom+xml':
-      self.handle_content()
-    else:
-      self.handle_verification()
+    """Handler for new content."""
+    pass
 
-  def handle_verification():
+  def get(self):
+    """Handler for verification."""
     query = models.TopicSubscription.all()
-    query.filter('topic = ', self.get('hub.topic'))
-    query.filter('verify_token = ', self.get('hub.verify_token'))
+    query.filter('topic = ', self.request.get('hub.topic'))
+    query.filter('verify_token = ', self.request.get('hub.verify_token'))
     
     topic = query.get()
     
@@ -100,9 +99,8 @@ class PubSubHandler(webapp.RequestHandler):
     topic.verified = True
     topic.put()
 
-  def handle_content(self):
-    pass
-    
+    # Hub wants us to echo back its challenge string to verify success.
+    self.response.out.write(self.request.get('hub.challenge'))
 
 class NewContentTestHandler(webapp.RequestHandler):
   
