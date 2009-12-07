@@ -39,3 +39,5 @@ class TwitterUser(db.Model):
 class TopicSubscription(db.Model):
   user_id = db.IntegerProperty(required=True)
   topic = db.StringProperty(required=True)
+  verify_token = db.StringProperty(required=True)
+  verified = db.BooleanProperty(default=False)

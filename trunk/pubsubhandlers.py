@@ -3,13 +3,17 @@
 import os
 import urllib
 import urllib2
+import random
 import xml.dom.minidom
 
 from google.appengine.ext import webapp
+from google.appengine.api import urlfetch
 
-import feeds
-import twitterutil
 import bitly
+import feeds
+import models
+import twitterutil
+
 
 def _get_text(nodelist):
   rc = ""
@@ -27,6 +31,12 @@ def _get_msg(entry):
   msg = "%s %s" % (title_short, link_short)
   return msg
 
+def _get_verify_token():
+  chars = []
+  for i in range(32):
+    chars.append(random.choice('0123456789ABCDEF'))
+  return ''.join(chars)
+  
 class AddSubscriptionHandler(webapp.RequestHandler):
   
   def post(self):
@@ -36,11 +46,63 @@ class AddSubscriptionHandler(webapp.RequestHandler):
     xml_doc = urllib2.urlopen(feed_url).read()
     hub_link = feeds.get_hub(xml_doc)
     self_link = feeds.get_self(xml_doc)
-    params = {'hub.callback': callback_url, 'hub.mode': 'subscribe', 'hub.topic': self_link, 'hub.verify': 'async'}
+
+    # If debug on localhost, we can't actually get verification from the
+    # server.  So hit the hub async and pretend we verified.
+    debug = os.environ['HTTP_HOST'].startswith('localhost')
+
+    verify_token = _get_verify_token()
+    params = {
+      'hub.callback': callback_url,
+      'hub.mode': 'subscribe',
+      'hub.topic': self_link, 
+      'hub.verify': 'sync' if not debug else 'async',
+      'hub.verify_token' : verify_token
+    }
     data = urllib.urlencode(params)
-    urllib2.urlopen(hub_link, data)
-    sub = models.TopicSubscription(user_id=user.user_id, topic=self_link)
+
+    # Make sure to add the subscription before hitting the hub.
+    sub = models.TopicSubscription(user_id=user.user_id, topic=self_link,
+                                   verify_token=verify_token, verified=debug)
     sub.put() 
+
+    response = urlfetch.fetch(hub_link, payload=data, method='POST')
+    if response.status_code != 202:
+      self.error(502)
+      self.response.out.write('Error registering with hub: ')
+      self.response.out.write(response.content)
+      return
+
+    self.redirect('/')
+
+class PubSubHandler(webapp.RequestHandler):
+
+  def post(self):
+    content_type = self.request.headers.get('Content-Type')
+    if content_type == 'application/atom+xml':
+      self.handle_content()
+    else:
+      self.handle_verification()
+
+  def handle_verification():
+    query = models.TopicSubscription.all()
+    query.filter('topic = ', self.get('hub.topic'))
+    query.filter('verify_token = ', self.get('hub.verify_token'))
+    
+    topic = query.get()
+    
+    if not topic:
+      self.error(404)
+      self.response.out.write(
+        'Topic subscription doesn\'t exist or was deleted')
+      return
+
+    topic.verified = True
+    topic.put()
+
+  def handle_content(self):
+    pass
+    
 
 class NewContentTestHandler(webapp.RequestHandler):
   

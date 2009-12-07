@@ -65,6 +65,7 @@ def main():
       ('/authenticate', twitteroauthhandlers.AuthenticateHandler),
       ('/tweet', TweetHandler),
       ('/oauth_callback', twitteroauthhandlers.CallbackHandler),
+      ('/pubsub', pubsubhandlers.PubSubHandler),
       ('/pubsub/add_subscription', pubsubhandlers.AddSubscriptionHandler),
       # Admin
       ('/admin/oauth_config', twitteroauthhandlers.OAuthConfigHandler),
