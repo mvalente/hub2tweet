@@ -44,8 +44,9 @@ class AddSubscriptionHandler(webapp.RequestHandler):
     feed_url = self.request.get('feed')
     callback_url = 'http://%s/pubsub' % os.environ['HTTP_HOST']
     xml_doc = urllib2.urlopen(feed_url).read()
-    hub_link = feeds.get_hub(xml_doc)
-    self_link = feeds.get_self(xml_doc)
+    feed = xml.dom.minidom.parseString(xml_doc).getElementsByTagName('feed')[0]
+    hub_link = feeds.get_hub(feed)
+    self_link = feeds.get_self(feed)
 
     # If debug on localhost, we can't actually get verification from the
     # server.  So hit the hub async and pretend we verified.
