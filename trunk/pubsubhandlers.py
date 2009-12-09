@@ -23,12 +23,9 @@ def _get_text(nodelist):
       rc = rc + node.data
   return rc
 
-def _get_msg(entry):
-  title_element = entry.getElementsByTagName('title')[0]
-  title = _get_text(title_element.childNodes)
-  link = feeds.get_self(entry)
-  title_short = title[0:140 - (1+len(link))]
-  link_short = bitly.get_shortened_url(link)
+def _get_msg(title, url):
+  link_short = bitly.get_shortened_url(url)
+  title_short = title[0:140 - (1+len(link_short))]
   msg = "%s %s" % (title_short, link_short)
   return msg
 
@@ -90,13 +87,18 @@ class PubSubHandler(webapp.RequestHandler):
     # Use this later
     feed_url = feeds.get_self(feed)
 
+    logging.info('Self: %s' % feed_url)
+
     key, secret = twitterutil.get_key_and_secret(91536090) # hard-code hub2tweet for now
+
     entries = feed.getElementsByTagName('entry')
     for entry in entries:
       entry_url = feeds.get_web_link(entry)
-      # TODO(nnaze): Reenable.
-      # msg = _get_msg(entry)
-      twitterutil.set_status(entry_url, key, secret)
+
+      title_element = entry.getElementsByTagName('title')[0]
+      title = _get_text(title_element.childNodes)
+      msg = _get_msg(title, entry_url)
+      twitterutil.set_status(msg, key, secret)
       self.response.out.write('sent tweet ' + msg)
 
 

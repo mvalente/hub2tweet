@@ -75,7 +75,9 @@ class TweetHandler(webapp.RequestHandler):
     self.redirect('http://twitter.com/%s' % screen_name)
 
   def get(self):
-    self.response.out.write(_TWEET_FORM)
+    pass
+    # Uncomment to use for testing.
+    # self.response.out.write(_TWEET_FORM)
 
     
 def main():

@@ -31,5 +31,5 @@ def get_web_link(entry):
   for link in entry.getElementsByTagName('link'):
     if link.getAttribute('rel') == 'alternate':
       if link.getAttribute('type') == 'text/html':
-        return link.getAttribute('html')
+        return link.getAttribute('href')
     
