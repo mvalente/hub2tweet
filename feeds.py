@@ -26,3 +26,10 @@ def _get_href_from_feed(node, rel_type):
       if element.hasAttribute('rel'):
         if element.getAttribute('rel') == rel_type:
           return element.getAttribute('href')
+
+def get_web_link(entry):
+  for link in entry.getElementsByTagName('link'):
+    if link.getAttribute('rel') == 'alternate':
+      if link.getAttribute('type') == 'text/html':
+        return link.getAttribute('html')
+    
