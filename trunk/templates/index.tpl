@@ -20,7 +20,16 @@
 </p>    
 
 <h4>Your linked feeds</h4>
-<p>Fill this in.</p>
+
+{% if subscriptions %}
+  <ul>
+  {% for subscription in subscriptions %}
+    <li>{{ subscription.topic|escape }}</li>
+  {% endfor %}
+  </ul>
+{% else %}
+<p>No feeds added yet.</p>
+{% endif %}
 
 <h4>Add a linked feed</h4>
 <p>Enter the URL of a PubSubHubBub-enabled Atom feed:<br/>

@@ -27,6 +27,10 @@ class MainHandler(webapp.RequestHandler):
       user = twitterutil.get_user_by_token_key(self.request.cookies['token'])
       values['user'] = user
 
+      query = models.TopicSubscription.all()
+      query.filter('user_id = ', user.user_id)
+      values['subscriptions'] = query.fetch(1000)
+
     text = template.render('templates/index.tpl', values)
     self.response.out.write(text)
 
