@@ -78,7 +78,7 @@ class AddSubscriptionHandler(webapp.RequestHandler):
 
     self.redirect('/')
 
-    class PubSubHandler(webapp.RequestHandler):
+class PubSubHandler(webapp.RequestHandler):
 
   def post(self):
     self.handle_atom_feed(self.request.body)
