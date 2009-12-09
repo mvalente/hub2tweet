@@ -5,6 +5,7 @@ import urllib
 import urllib2
 import random
 import xml.dom.minidom
+import logging
 
 from google.appengine.ext import webapp
 from google.appengine.api import urlfetch
@@ -77,11 +78,27 @@ class AddSubscriptionHandler(webapp.RequestHandler):
 
     self.redirect('/')
 
-class PubSubHandler(webapp.RequestHandler):
+    class PubSubHandler(webapp.RequestHandler):
 
   def post(self):
-    """Handler for new content."""
-    pass
+    self.handle_atom_feed(self.request.body)
+
+  def handle_atom_feed(self, atom):
+    xml_doc = xml.dom.minidom.parseString(atom)
+
+    feed = xml_doc.getElementsByTagName('feed')[0]
+    # Use this later
+    feed_url = feeds.get_self(feed)
+
+    key, secret = twitterutil.get_key_and_secret(91536090) # hard-code hub2tweet for now
+    entries = feed.getElementsByTagName('entry')
+    for entry in entries:
+      entry_url = feeds.get_web_link(entry)
+      # TODO(nnaze): Reenable.
+      # msg = _get_msg(entry)
+      twitterutil.set_status(entry_url, key, secret)
+      self.response.out.write('sent tweet ' + msg)
+
 
   def get(self):
     """Handler for verification."""
@@ -102,26 +119,6 @@ class PubSubHandler(webapp.RequestHandler):
 
     # Hub wants us to echo back its challenge string to verify success.
     self.response.out.write(self.request.get('hub.challenge'))
-
-class NewContentTestHandler(webapp.RequestHandler):
-  
-  #def post(self):
-  #  TODO(nathan): Add later
-
-  # TODO(nathan): remove this, make a POST
-  def get(self):
-    self.handle_atom_feed(open('feedstest.xml').read())
-
-  def handle_atom_feed(self, atom):
-    xml_doc = xml.dom.minidom.parseString(atom)
-    key, secret = twitterutil.get_key_and_secret(91536090) # hard-code hub2tweet for now
-    elements = xml_doc.getElementsByTagName('entry')
-    for entry in elements:
-      msg = _get_msg(entry)
-      twitterutil.set_status(msg, key, secret)
-      self.response.out.write('sent tweet ' + msg)
-
-  
 
 class AddSubscriptionFormHandler(webapp.RequestHandler):
 

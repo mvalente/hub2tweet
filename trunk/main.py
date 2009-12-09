@@ -25,11 +25,12 @@ class MainHandler(webapp.RequestHandler):
     values = {}
     if 'token' in self.request.cookies:
       user = twitterutil.get_user_by_token_key(self.request.cookies['token'])
-      values['user'] = user
+      if user:
+        values['user'] = user
 
-      query = models.TopicSubscription.all()
-      query.filter('user_id = ', user.user_id)
-      values['subscriptions'] = query.fetch(1000)
+        query = models.TopicSubscription.all()
+        query.filter('user_id = ', user.user_id)
+        values['subscriptions'] = query.fetch(1000)
 
     text = template.render('templates/index.tpl', values)
     self.response.out.write(text)
@@ -49,6 +50,17 @@ def _get_text(nodelist):
   return rc
 
 
+_TWEET_FORM = """
+<html>
+  <body>
+    <form action="/tweet" method=POST>
+      <input name="tweet" type="text">
+      <input value="tweet" type="submit">
+    </form>
+  </body>
+</html>
+"""
+
 class TweetHandler(webapp.RequestHandler):
   
   def post(self):
@@ -61,8 +73,13 @@ class TweetHandler(webapp.RequestHandler):
     screen_name_elem = user_elem.getElementsByTagName('screen_name')[0]
     screen_name = _get_text(screen_name_elem.childNodes)
     self.redirect('http://twitter.com/%s' % screen_name)
+
+  def get(self):
+    self.response.out.write(_TWEET_FORM)
+
     
 def main():
+  logging.getLogger().setLevel(logging.DEBUG)
   application = webapp.WSGIApplication([
       ('/', MainHandler),
       ('/logout', LogOutHander),
@@ -74,7 +91,6 @@ def main():
       # Admin
       ('/admin/oauth_config', twitteroauthhandlers.OAuthConfigHandler),
       ('/admin/test_add_sub', pubsubhandlers.AddSubscriptionFormHandler),
-      ('/admin/test_new_content_handler', pubsubhandlers.NewContentTestHandler)
       ], debug=True)
   wsgiref.handlers.CGIHandler().run(application)
 
