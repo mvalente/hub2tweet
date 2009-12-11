@@ -1,5 +1,7 @@
 import sys
+import urllib
 import urllib2
+import logging
 
 from django.utils import simplejson
 
@@ -9,7 +11,14 @@ def get_shortened_url(url):
   """Shorten the given URL with the Bitly API."""
   version = '2.0.1'
   login = 'nanaze'
-  bitly_url= "http://api.bit.ly/shorten?version=%s&longUrl=%s&login=%s&apiKey=%s" % (version, url, login, _BITLY_API_KEY)
+  query_params = urllib.urlencode({
+    'version': version,
+    'longUrl': url,
+    'login': login,
+    'apiKey': _BITLY_API_KEY
+  })
+  bitly_url= 'http://api.bit.ly/shorten?' + query_params
+  logging.info('bitly_url %s',  bitly_url)
   response = urllib2.urlopen(bitly_url).read()
   json = simplejson.loads(response)
   return json['results'].values()[0]['shortUrl']
