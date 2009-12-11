@@ -90,6 +90,7 @@ def main():
       ('/oauth_callback', twitteroauthhandlers.CallbackHandler),
       ('/pubsub', pubsubhandlers.PubSubHandler),
       ('/pubsub/add_subscription', pubsubhandlers.AddSubscriptionHandler),
+      ('/pubsub/delete_subscription', pubsubhandlers.DeleteSubscriptionHandler),
       # Admin
       ('/admin/oauth_config', twitteroauthhandlers.OAuthConfigHandler),
       ('/admin/test_add_sub', pubsubhandlers.AddSubscriptionFormHandler),
