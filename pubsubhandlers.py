@@ -26,6 +26,10 @@ def _get_text(nodelist):
 def _get_msg(title, url):
   link_short = bitly.get_shortened_url(url)
   title_short = title[0:140 - (1+len(link_short))]
+
+  # OAuth is complaining about non-ascii.  Just drop all non-ASCII for now.
+  title_short = title_short.encode('ascii', 'ignore')
+
   msg = "%s %s" % (title_short, link_short)
   return msg
 
@@ -88,8 +92,14 @@ class PubSubHandler(webapp.RequestHandler):
     feed_url = feeds.get_self(feed)
 
     logging.info('Self: %s' % feed_url)
-
-    key, secret = twitterutil.get_key_and_secret(91536090) # hard-code hub2tweet for now
+    
+    query = models.TopicSubscription.all()
+    query.filter('topic =', feed_url)
+    
+    # Precalculate and store these as they're in datastore.
+    tweet_pairs = []
+    for sub in query:
+      tweet_pairs.append(twitterutil.get_key_and_secret(sub.user_id))
 
     entries = feed.getElementsByTagName('entry')
     for entry in entries:
@@ -98,8 +108,12 @@ class PubSubHandler(webapp.RequestHandler):
       title_element = entry.getElementsByTagName('title')[0]
       title = _get_text(title_element.childNodes)
       msg = _get_msg(title, entry_url)
-      twitterutil.set_status(msg, key, secret)
-      self.response.out.write('sent tweet ' + msg)
+
+      # Send to every subscriber
+      for key, secret in tweet_pairs:
+        twitterutil.set_status(msg, key, secret)
+  
+    self.response.out.write('completed')
 
 
   def get(self):
