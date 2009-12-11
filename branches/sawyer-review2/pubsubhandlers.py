@@ -129,7 +129,7 @@ class AddSubscriptionFormHandler(webapp.RequestHandler):
 
 class DeleteSubscriptionHandler:
   
-  def get_post(self):
+  def post(self):
     key_name = self.request.get('key')
     subscription = models.TopicSubscription.get_by_key_name(key_name)
     subscription.delete()

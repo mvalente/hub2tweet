@@ -127,6 +127,13 @@ class AddSubscriptionFormHandler(webapp.RequestHandler):
   def get(self):
    self.response.out.write(_TEST_SUBSCRIPTION_CONTENT)
 
+class DeleteSubscriptionHandler:
+  
+  def get_post(self):
+    key_name = self.request.get('key')
+    subscription = models.TopicSubscription.get_by_key_name(key_name)
+    subscription.delete()
+
 _TEST_SUBSCRIPTION_CONTENT = """
 <html>
   <body>
