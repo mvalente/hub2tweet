@@ -11,8 +11,10 @@
   instantly!
 </p>
 
-<p>(Well, it will when we're done with it.  It's still a work in progress.  But
-  you can log in and tweet from hub2tweet for now.  We'll be done by December 11.)</p>
+<p>
+This is beta, naturally, so please give it a whirl.  Report any issues you have
+on our <a href="http://code.google.com/p/hub2tweet/issues/list">issues</a> page.
+</p>
 
 {% if user %}
 <p>You are logged in as {{ user.screen_name }}.
