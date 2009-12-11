@@ -24,11 +24,17 @@
 {% if subscriptions %}
   <ul>
   {% for subscription in subscriptions %}
-    <li>{{ subscription.topic|escape }}</li>
+    <li>{{ subscription.topic|escape }}
+    <br>
+    <form action="/pubsub/delete_subscription" method=POST>
+      <input type="hidden" name="id" value="{{ subscription.key.id|escape }}"/>
+      <input type="submit" value="Delete"/>
+    </form>
+    </li>
   {% endfor %}
   </ul>
 {% else %}
-<p>No feeds added yet.</p>
+<p>No feeds added.</p>
 {% endif %}
 
 <h4>Add a linked feed</h4>

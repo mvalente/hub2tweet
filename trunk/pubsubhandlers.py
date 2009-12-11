@@ -127,12 +127,24 @@ class AddSubscriptionFormHandler(webapp.RequestHandler):
   def get(self):
    self.response.out.write(_TEST_SUBSCRIPTION_CONTENT)
 
-class DeleteSubscriptionHandler:
+class DeleteSubscriptionHandler(webapp.RequestHandler):
   
-  def get_post(self):
-    key_name = self.request.get('key')
-    subscription = models.TopicSubscription.get_by_key_name(key_name)
-    subscription.delete()
+  def post(self):
+    user = twitterutil.get_user_by_token_key(self.request.cookies['token'])
+
+    if user:
+      id = int(self.request.get('id'))
+      subscription = models.TopicSubscription.get_by_id(id)
+
+      # Ensure this user owns this subscription.
+      if user.user_id == subscription.user_id:
+        subscription.delete()
+        self.redirect('/')
+        return
+
+    self.error(403)
+    self.response.out('Not authorized')
+
 
 _TEST_SUBSCRIPTION_CONTENT = """
 <html>
